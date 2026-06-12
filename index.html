@@ -444,6 +444,10 @@ document.addEventListener('DOMContentLoaded', moxieWatchLogos);
         .news-item:last-child{border-bottom:0;padding-bottom:0}
         .news-item:hover .news-title{color:var(--accent-d)}
         .news-tag{flex-shrink:0;font-size:10px;color:var(--ink-3);font-weight:600;margin-top:1px}
+        .news-score{flex-shrink:0;font-family:var(--mono);font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;margin-top:1px}
+        .news-score.s-high{background:var(--accent-soft);color:var(--accent-d)}
+        .news-score.s-mid{background:#E8F1FF;color:#2563EB}
+        .news-score.s-low{background:var(--bg-soft);color:var(--ink-2)}
         .news-title{flex:1;font-size:12.5px;color:var(--ink);line-height:1.45}
         .news-time{flex-shrink:0;font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:1px}
       </style>
@@ -526,13 +530,19 @@ document.addEventListener('DOMContentLoaded', moxieWatchLogos);
             window.moxieWhenDBReady(async function(db){
               try {
                 if (!db || !box || !window.MoxieDB || !window.MoxieDB.news) { fallbackClickable(); return; }
-                var res = await window.MoxieDB.news({ limit: 5 });
+                var res = await window.MoxieDB.news({ limit: 40 });
                 var items = res && res.data;
                 if (!items || !items.length) { fallbackClickable(); return; }
+                // 跟新闻中心一致:按重要性(score)排,取前 6 条
+                items = items.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); }).slice(0, 6);
+                function scl(v){ return v==null?'s-low':(v>=7?'s-high':(v>=5.5?'s-mid':'s-low')); }
                 box.innerHTML = items.map(function(n){
                   var time = rel(n.published_at);
+                  var sc = (n.score!=null) ? '<span class="news-score '+scl(n.score)+'">'+Number(n.score).toFixed(1)+'</span>' : '';
+                  var cat = (n.category && n.category[0]) ? n.category[0] : (n.tag||n.source||'');
                   return '<a class="news-item" href="/news/'+n.id+'">'
-                    + '<span class="news-tag">'+esc(n.tag||n.source||'')+'</span>'
+                    + sc
+                    + '<span class="news-tag">'+esc(cat)+'</span>'
                     + '<span class="news-title">'+esc(n.title)+'</span>'
                     + '<span class="news-time">'+esc(time)+'</span></a>';
                 }).join('');
