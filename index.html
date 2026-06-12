@@ -32,7 +32,7 @@
 
 <!-- MiSans ExtraLight · 小米开源中文超细体 (商用免费 · jsDelivr CDN 分块按需加载) -->
 <link rel="stylesheet" href="https://registry.npmmirror.com/misans-webfont/4.3.1/files/misans/misans-extralight/result.min.css">
-<link rel="stylesheet" href="moxie-styles.css?v=20260608-02">
+<link rel="stylesheet" href="moxie-styles.css?v=20260612-03">
 <script src="moxie-supabase.js?v=20260611-01"></script>
 <script src="moxie-shared.js?v=20260611-02" defer></script>
 <script>
@@ -1021,8 +1021,8 @@ document.addEventListener('DOMContentLoaded', moxieWatchLogos);
             ${p.verified ? '<span class="verified-tag">子墨测过</span>' : ''}${domBadge(p)}
           </div>
           <div class="pdesc">${escHtml(p.tagline)}</div>
+          <div class="ptags">${(p.tags||[]).slice(0,3).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
         </div>
-        <div class="ptags">${(p.tags||[]).slice(0,2).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
         <span class="pprice">${escHtml(p.price_label || '免费')}</span>
         <div class="pvote" data-product-id="${p.id}"><span class="tri">▲</span><span class="num">${p.vote_count}</span></div>
       </a>
@@ -1068,8 +1068,8 @@ document.addEventListener('DOMContentLoaded', moxieWatchLogos);
               ${p.verified ? '<span class="verified-tag">子墨测过</span>' : ''}${domBadge(p)}
             </div>
             <div class="pdesc">${escHtml(p.tagline)}</div>
+            <div class="ptags">${(p.tags||[]).slice(0,3).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
           </div>
-          <div class="ptags">${(p.tags||[]).slice(0,2).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
           <span class="pprice">${escHtml(p.price_label || '免费')}</span>
           <div class="pvote" data-product-id="${p.id}"><span class="tri">▲</span><span class="num">${p.vote_count}</span></div>
         </a>
@@ -1393,8 +1393,8 @@ document.addEventListener('DOMContentLoaded', moxieWatchLogos);
       + '<div class="plogo has-img"><img src="/public/logos/' + p.domain + '.png" data-domain="' + p.domain + '" alt="' + esc(p.name) + '" onerror="moxieLogoFallback(this)"/></div>'
       + '<div class="pmain"><div class="ptop"><span class="pname">' + esc(p.name) + '</span>'
       + (p.verified ? '<span class="verified-tag">子墨测过</span>' : '') + domBadge(p) + '</div>'
-      + '<div class="pdesc">' + esc(p.tagline) + '</div></div>'
-      + '<div class="ptags">' + (p.tags||[]).slice(0,2).map(function(t){ return '<span class="ptag">' + esc(t) + '</span>'; }).join('') + '</div>'
+      + '<div class="pdesc">' + esc(p.tagline) + '</div>'
+      + '<div class="ptags">' + (p.tags||[]).slice(0,3).map(function(t){ return '<span class="ptag">' + esc(t) + '</span>'; }).join('') + '</div></div>'
       + '<span class="pprice">' + esc(p.price_label || '免费') + '</span>'
       + '<div class="pvote" data-product-id="' + p.id + '"><span class="tri">▲</span><span class="num">' + p.vote_count + '</span></div>'
       + '</a>';
