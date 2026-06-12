@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="public/moxie-mark.png?v=20260525-01">
+<title>MOXIE · AI 选型决策平台 — 国产 + 海外 AI 工具精选导航</title>
+<meta name="description" content="MOXIE:中文 AI 工具导航与选型决策平台。编辑团队亲测,按真实可用性排榜,精选国产与海外 AI 工具,按大模型 / AI 编程 / AI 图像 / AI 视频等分类一站直达。">
+<link rel="canonical" href="https://www.latemai.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MOXIE · AI 选型决策平台">
+<meta property="og:description" content="中文 AI 工具导航与选型:国产 + 海外 AI 工具精选,按真实可用性排榜。">
+<meta property="og:url" content="https://www.latemai.com/">
+
+<!-- 中文：思源黑体 (Source Han Sans / Noto Sans SC) -->
+<!-- 自托管拉丁字族(woff2 同源加载)替换被墙的 Google Fonts / 慢到不可用的 loli 镜像。
+     中文走系统 PingFang SC / 微软雅黑(已在 moxie-styles.css 字族栈里兜底),不下载巨大的 Noto Sans SC。 -->
+<link rel="stylesheet" href="public/fonts/moxie-fonts.css?v=20260611-01">
+
+<!-- 中文展示字采用 Noto Sans SC 900（= 思源黑体 Heavy）。已包含在上方 Google Fonts URL 的 :wght@...;900 中 -->
+<!-- 若想换 Alibaba PuHuiTi，需自托管 .woff2，无可靠公网 CDN -->
+
+<!-- 第三方点缀：Lenis 平滑滚动 + Lucide 图标 · 大陆走 npmmirror（unpkg/jsdelivr 大陆不通/极慢） -->
+<script src="https://registry.npmmirror.com/lenis/1.1.13/files/dist/lenis.min.js"></script>
+<script src="https://registry.npmmirror.com/lucide/latest/files/dist/umd/lucide.min.js"></script>
+
+<!-- GSAP 3.13 全家桶（Webflow 收购后全部开源免费） · 大陆走 npmmirror -->
+<script src="https://registry.npmmirror.com/gsap/3.13.0/files/dist/gsap.min.js"></script>
+<script src="https://registry.npmmirror.com/gsap/3.13.0/files/dist/ScrollTrigger.min.js"></script>
+<script src="https://registry.npmmirror.com/gsap/3.13.0/files/dist/SplitText.min.js"></script>
+
+
+<!-- MiSans ExtraLight · 小米开源中文超细体 (商用免费 · jsDelivr CDN 分块按需加载) -->
+<link rel="stylesheet" href="https://registry.npmmirror.com/misans-webfont/4.3.1/files/misans/misans-extralight/result.min.css">
+<link rel="stylesheet" href="moxie-styles.css?v=20260608-02">
+<script src="moxie-supabase.js?v=20260611-01"></script>
+<script src="moxie-shared.js?v=20260611-02" defer></script>
+<script>
+/* 大陆 logo 兜底:工具 logo 图(DuckDuckGo icons,大陆可直连;个别取不到时)加载失败 → 换成首字母块,永不裂图。
+   主触发:每个 <img> 上的 onerror="moxieLogoFallback(this)";备份:全局 capture 监听。 */
+window.moxieLogoFallback = function(img){
+  if(!img || img.dataset.logoFallback) return;
+  img.dataset.logoFallback='1';
+  var box = img.parentElement;
+  var ch = ((img.getAttribute('alt')||'').trim().charAt(0) || '?').toUpperCase();
+  if(box && box.classList && box.classList.contains('plogo')){
+    /* .plogo 基础样式本就是居中文字块:去掉 has-img、塞首字母即可 */
+    box.classList.remove('has-img');
+    box.textContent = ch;
+    box.style.fontWeight = '700';
+    box.style.fontSize = '14px';
+  } else {
+    /* 非 .plogo 容器(详情/编辑推荐):换成首字母 SVG,保持原 <img> 尺寸 */
+    img.src = 'data:image/svg+xml,'+encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">'
+      +'<rect width="128" height="128" rx="26" fill="#EFEDE7"/>'
+      +'<text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" '
+      +'font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="62" font-weight="700" fill="#A89F8C">'+ch+'</text></svg>');
+  }
+};
+document.addEventListener('error', function(e){
+  var img=e.target;
+  if(!img || img.tagName!=='IMG') return;
+  var oe = img.getAttribute && img.getAttribute('onerror');
+  if(!oe || oe.indexOf('moxieLogoFallback')<0) return;
+  window.moxieLogoFallback(img);
+}, true);
+/* 大陆下远程 favicon 可能挂起数秒才 timeout → 主动 3.5s 兜底,避免长时间空白。
+   按 onerror 标记选取所有 logo <img>(含后续动态注入的),与图源 URL 无关。 */
+function moxieWatchLogos(){
+  document.querySelectorAll('img[onerror*="moxieLogoFallback"]:not([data-logo-watch])').forEach(function(img){
+    img.setAttribute('data-logo-watch','1');
+    if(img.complete && img.naturalWidth>0) return;
+    setTimeout(function(){
+      if(!img.dataset.logoFallback && (!img.complete || img.naturalWidth===0)) window.moxieLogoFallback(img);
+    }, 3500);
+  });
+}
+new MutationObserver(moxieWatchLogos).observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded', moxieWatchLogos);
+</script>
+</head>
+<body>
+
+<!-- ═══════ TOPBAR ═══════ -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a href="moxie-preview.html" class="brand-logo">
+      <img src="public/moxie-logo.png?v=20260525-01" alt="MOXIE" width="100" height="24">
+    </a>
+    <nav class="nav-center">
+      <a href="moxie-preview.html" >榜单</a>
+      <a href="moxie-business.html">商业落地</a>
+      <div class="nav-mega" id="navMega">
+        <button class="nav-mega-trigger" type="button">
+          分类
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="mega-menu">
+          <div class="mega-grid">
+            <div class="mega-col">
+              <h4>AIGC 创作 <span class="h4-tag">184</span></h4>
+              <ul>
+                <li><a href="moxie-aigc.html"><span>AI 写作</span><span class="cnt">42</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 图像</span><span class="cnt">58</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 视频</span><span class="cnt">36</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 语音 / 配音</span><span class="cnt">24</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 音乐</span><span class="cnt">14</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 数字人</span><span class="cnt">10</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>模型 / 平台 <span class="h4-tag">125</span></h4>
+              <ul>
+                <li><a href="moxie-preview.html"><span>大模型</span><span class="cnt">32</span></a></li>
+                <li><a href="moxie-preview.html"><span>AI 助手</span><span class="cnt">28</span></a></li>
+                <li><a href="moxie-business.html"><span>RAG 知识库</span><span class="cnt">28</span></a></li>
+                <li><a href="moxie-business.html"><span>AI Agent</span><span class="cnt">19</span></a></li>
+                <li><a href="moxie-business.html"><span>工作流 / Bot</span><span class="cnt">25</span></a></li>
+                <li><a href="moxie-business.html"><span>客服 / SDR</span><span class="cnt">14</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>开发者 / 效率 <span class="h4-tag">156</span></h4>
+              <ul>
+                <li><a href="moxie-preview.html"><span>AI 编程</span><span class="cnt">41</span></a></li>
+                <li><a href="moxie-preview.html"><span>AI 搜索</span><span class="cnt">18</span></a></li>
+                <li><a href="moxie-preview.html"><span>翻译</span><span class="cnt">12</span></a></li>
+                <li><a href="moxie-preview.html"><span>Chrome 扩展</span><span class="cnt">38</span></a></li>
+                <li><a href="moxie-preview.html"><span>办公 / 协作</span><span class="cnt">22</span></a></li>
+                <li><a href="moxie-preview.html"><span>数据分析</span><span class="cnt">16</span></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="mega-foot">
+            <a href="moxie-categories.html" class="all-link">查看全部 <span class="js-cat-count">24</span> 个分类 →</a>
+            <span class="submit-hint">没找到你的分类？<a href="moxie-submit.html">提交一个</a></span>
+          </div>
+        </div>
+      </div>
+      <a href="moxie-blog.html">文章</a>
+      
+    </nav>
+    <div class="top-actions">
+      <a href="moxie-submit.html" class="btn-ghost-sm">提交产品</a>
+      <a href="moxie-login.html" class="btn-accent" id="loginBtn">登录</a>
+    </div>
+  </div>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-left">
+      <span class="hero-badge">
+        <span class="live-dot"></span>
+        中文 AI 工具的每日编辑精选 · 第 142 期
+      </span>
+      <h1 class="hero-h1-big">每天 <span class="brand-mark">200+</span> AI 新品，替你挑出 <span class="brand-mark">23</span> 款</h1>
+      <p class="hero-sub-big">编辑团队亲手测过，按真实可用性排榜，也能装到你的 Claude / Cursor，AI 选工具时优先用 MOXIE 精选</p>
+
+      <!-- CLI 安装 -->
+      <div class="install-section">
+        <div class="install-tabs">
+          <button class="install-tab active" data-install="chat">
+            <i data-lucide="message-square-text"></i>
+            给 AI Agent 用
+          </button>
+          <button class="install-tab" data-install="cli">
+            <i data-lucide="terminal"></i>
+            开发者命令行
+          </button>
+        </div>
+
+        <div class="install-card">
+          <!-- 内层 sub-tabs -->
+          <div class="install-subtabs">
+            <button class="install-subtab active">推荐用 MOXIE 选工具 <span class="badge-flash">⚡</span></button>
+            <button class="install-subtab">只接入数据</button>
+          </div>
+
+          <!-- 内容 -->
+          <div class="install-content" id="installPanel">
+            <div class="install-hint">这段提示词发给 Claude / Cursor / Trae，它选 AI 工具时会从 MOXIE 精选库里挑。</div>
+            <div class="install-cmd">
+              <code id="installCmd">参考 https://latemai.com/install/agent.md 接入 MOXIE 精选库</code>
+              <button class="copy-btn" id="copyBtn" title="复制">
+                <i data-lucide="copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 探索区：标题 + 搜索 + 探索按钮 (一整行) -->
+  <div class="container explore-block">
+    <h2 class="explore-title">不止今日精选，<b class="js-tool-count">3,847</b> 款 AI 工具都在这</h2>
+    <div class="explore-row">
+      <div class="explore-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="搜索工具名称 / maker / 标签…" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- 实时活动 ticker -->
+  <div class="container" style="position: relative; z-index: 1; margin-top: 24px;">
+    <div class="live-ticker">
+      <span class="live-ticker-label">
+        <span class="live-dot"></span>
+        热门分类
+      </span>
+      <div class="live-ticker-track">
+        <div class="live-ticker-scroll" id="liveTicker">
+          <span class="ticker-item"><span class="dot"></span>AI 写作 <span class="time">· 42 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 图像 <span class="time">· 58 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 视频 <span class="time">· 36 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 编程 <span class="time">· 41 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>大模型 <span class="time">· 32 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>Chrome 扩展 <span class="time">· 38 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 搜索 <span class="time">· 18 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>RAG 知识库 <span class="time">· 28 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>工作流 / Bot <span class="time">· 25 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 语音 / 配音 <span class="time">· 24 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>办公 / 协作 <span class="time">· 22 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 数字人 <span class="time">· 10 款</span></span>
+          <!-- 复制一份保证无缝循环 -->
+          <span class="ticker-item"><span class="dot"></span>AI 写作 <span class="time">· 42 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 图像 <span class="time">· 58 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 视频 <span class="time">· 36 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 编程 <span class="time">· 41 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>大模型 <span class="time">· 32 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>Chrome 扩展 <span class="time">· 38 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 搜索 <span class="time">· 18 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>RAG 知识库 <span class="time">· 28 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>工作流 / Bot <span class="time">· 25 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 语音 / 配音 <span class="time">· 24 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>办公 / 协作 <span class="time">· 22 款</span></span>
+          <span class="ticker-item"><span class="dot"></span>AI 数字人 <span class="time">· 10 款</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="container">
+  <div class="main">
+
+    <!-- LEFT -->
+    <aside>
+      <style>
+        .side-arts{display:flex;flex-direction:column}
+        .side-art{display:block;text-decoration:none;padding:11px 0;border-bottom:1px solid var(--line)}
+        .side-art:first-child{padding-top:0}
+        .side-art:last-child{border-bottom:0;padding-bottom:0}
+        .side-art-meta{font-size:10px;color:var(--ink-3);margin-bottom:5px;letter-spacing:.03em}
+        .side-art-meta .tag{font-weight:600;color:var(--ink-2)}
+        .side-art-title{font-size:12.5px;line-height:1.5;color:var(--ink);font-weight:500}
+        .side-art:hover .side-art-title{color:var(--accent)}
+      </style>
+      <div class="side-block">
+        <div class="sec-label">
+          <span>本月趋势</span>
+        </div>
+        <div class="trend-list" id="trendList">
+          <div class="trend-item">
+            <span class="t-rank">01</span>
+            <span class="t-name">AI 编程工具</span>
+            <span class="t-delta">↑ 23%</span>
+          </div>
+          <div class="trend-item">
+            <span class="t-rank">02</span>
+            <span class="t-name">视频生成模型</span>
+            <span class="t-delta">↑ 18%</span>
+          </div>
+          <div class="trend-item">
+            <span class="t-rank">03</span>
+            <span class="t-name">RAG 知识库</span>
+            <span class="t-delta">↑ 15%</span>
+          </div>
+          <div class="trend-item">
+            <span class="t-rank">04</span>
+            <span class="t-name">Chrome 扩展</span>
+            <span class="t-delta">↑ 9%</span>
+          </div>
+          <div class="trend-item">
+            <span class="t-rank">05</span>
+            <span class="t-name">国产大模型</span>
+            <span class="t-delta">↑ 7%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-block">
+        <div class="sec-label">
+          <span>AI 业界热议</span>
+        </div>
+        <div class="post-list" id="postList">
+          <div class="post-item">
+            <div class="post-head">
+              <div class="post-av">王</div>
+              <div>
+                <div class="post-name">王哲明</div>
+              </div>
+              <span class="post-time">· 2h</span>
+            </div>
+            <div class="post-title">DeepSeek V3 真的能替代 Claude 3.5 Sonnet 吗</div>
+            <span class="post-tag">// 模型</span>
+          </div>
+          <div class="post-item">
+            <div class="post-head">
+              <div class="post-av">张</div>
+              <div>
+                <div class="post-name">张敏</div>
+              </div>
+              <span class="post-time">· 5h</span>
+            </div>
+            <div class="post-title">Coze 工作流卡在 webhook，求大佬指路</div>
+          </div>
+          <div class="post-item">
+            <div class="post-head">
+              <div class="post-av">李</div>
+              <div>
+                <div class="post-name">李铭</div>
+              </div>
+              <span class="post-time">· 8h</span>
+            </div>
+            <div class="post-title">Cursor Pro 限频之后中文 maker 怎么续命</div>
+            <span class="post-tag">// 工具</span>
+          </div>
+          <div class="post-item">
+            <div class="post-head">
+              <div class="post-av">周</div>
+              <div>
+                <div class="post-name">周野</div>
+              </div>
+              <span class="post-time">· 12h</span>
+            </div>
+            <div class="post-title">「AI 套壳」这个词应该怎么客观定义</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-block">
+        <div class="sec-label">
+          <span>近期文章</span>
+          <a href="moxie-blog.html" class="all-link" style="font-size:11px">全部 →</a>
+        </div>
+        <div class="side-arts" id="sideArts">
+          <!-- 兜底:DB 就绪后由下方脚本用真实文章替换;失败则保留这几条 -->
+          <a class="side-art" href="moxie-article.html">
+            <div class="side-art-meta"><span class="tag">REVIEW</span> · 2026.05.21</div>
+            <div class="side-art-title">DeepSeek V3 中文实测：跑完 6 个真实场景，发现 Claude 没有的 3 个优势</div>
+          </a>
+          <a class="side-art" href="moxie-article.html">
+            <div class="side-art-meta"><span class="tag">REVIEW</span> · 2026.05.18</div>
+            <div class="side-art-title">Coze vs Dify vs FastGPT 2026：中文 RAG 工作流谁更适合企业落地</div>
+          </a>
+          <a class="side-art" href="moxie-article.html">
+            <div class="side-art-meta"><span class="tag">GROWTH</span> · 2026.05.12</div>
+            <div class="side-art-title">中文 AI maker 第一批 1,000 用户怎么来：7 位创始人的真实路径</div>
+          </a>
+        </div>
+        <script>
+          /* 近期文章接真数据:读最新 published 文章,链到 /articles/<slug>;失败保留兜底 */
+          (function(){
+            if (!window.moxieWhenDBReady) return;
+            var box = document.getElementById('sideArts');
+            function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+            function fdate(s){ if(!s) return ''; var d=new Date(s); if(isNaN(d)) return ''; return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); }
+            window.moxieWhenDBReady(async function(db){
+              if (!db || !box || !window.MoxieDB) return;
+              try {
+                var res = await window.MoxieDB.articles({ limit: 4 });
+                var arts = res && res.data;
+                if (!arts || !arts.length) return;
+                box.innerHTML = arts.map(function(a){
+                  var cat = a.category ? esc(a.category) : 'ARTICLE';
+                  var dt = fdate(a.published_at || a.created_at);
+                  return '<a class="side-art" href="/articles/'+encodeURIComponent(a.slug)+'">'
+                    + '<div class="side-art-meta"><span class="tag">'+cat+'</span>'+(dt?' · '+dt:'')+'</div>'
+                    + '<div class="side-art-title">'+esc(a.title)+'</div></a>';
+                }).join('');
+              } catch(e){ /* 保留兜底 */ }
+            });
+          })();
+        </script>
+      </div>
+    </aside>
+
+    <!-- CENTER -->
+    <div class="center-col" id="today-list">
+      <div class="center-top">
+        <div class="tabs">
+          <a class="tab active">今日</a>
+          <a class="tab">本周</a>
+          <a class="tab">本月</a>
+          <a class="tab">年榜</a>
+        </div>
+        <div class="countdown-chip inline">
+          <span class="cd-pulse"></span>
+          <span>下一轮上新 · <span class="cd-rel" id="cd-rel">--</span></span>
+        </div>
+      </div>
+
+      <style>
+        .cat-bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+        .cat-chip{padding:6px 13px;border:1px solid var(--line);background:var(--bg);border-radius:9999px;font-size:13px;color:var(--ink-2);cursor:pointer;font-family:inherit;transition:.12s;white-space:nowrap}
+        .cat-chip:hover{border-color:var(--accent);color:var(--ink)}
+        .cat-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+        /* 国内可用小标 */
+        .pdom{display:inline-block;margin-left:7px;font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;vertical-align:middle;line-height:1.6}
+        .pdom-yes{color:#00875A;background:rgba(0,180,42,.1)}
+        .pdom-proxy{color:#C25100;background:rgba(255,125,0,.1)}
+        .pdom-no{color:#86909C;background:rgba(134,144,156,.12)}
+        /* 榜单前 5 名名次高亮:前 3 强调橙、4-5 浅一档 */
+        .prod-list .prow:nth-child(-n+5) .prank-cell{color:var(--accent);font-weight:700}
+        .prod-list .prow:nth-child(-n+3) .prank-cell{font-size:14px}
+        .prod-list .prow:nth-child(n+4):nth-child(-n+5) .prank-cell{opacity:.72}
+      </style>
+      <nav class="cat-bar" id="catBar"></nav>
+
+      <div class="prod-list" id="prodList">
+        <div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">加载中…</div>
+      </div>
+
+      <div class="show-all" id="showAllRow">
+        <a href="moxie-categories.html" class="btn-show">查看全部 <span class="js-tool-count">23</span> 款</a>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <aside>
+      <style>
+        .news-head-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#F53F3F;font-weight:600;margin-left:6px;vertical-align:middle}
+        .news-head-live .d{width:6px;height:6px;border-radius:50%;background:#F53F3F;animation:npulse 1.6s infinite}
+        @keyframes npulse{0%{box-shadow:0 0 0 0 rgba(245,63,63,.5)}70%{box-shadow:0 0 0 5px rgba(245,63,63,0)}100%{box-shadow:0 0 0 0 rgba(245,63,63,0)}}
+        .news-list{display:flex;flex-direction:column}
+        .news-item{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);text-decoration:none}
+        .news-item::before{content:'';flex-shrink:0;margin-top:6px;width:5px;height:5px;border-radius:50%;background:#F53F3F;opacity:.7}
+        .news-item:first-child{padding-top:0}
+        .news-item:last-child{border-bottom:0;padding-bottom:0}
+        .news-item:hover .news-title{color:var(--accent-d)}
+        .news-tag{flex-shrink:0;font-size:10px;color:var(--ink-3);font-weight:600;margin-top:1px}
+        .news-title{flex:1;font-size:12.5px;color:var(--ink);line-height:1.45}
+        .news-time{flex-shrink:0;font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:1px}
+      </style>
+      <div class="assistant-card">
+        <div class="assistant-eyebrow">
+          <span class="live-dot"></span>
+          MOXIE ASSISTANT
+        </div>
+        <h3>说出你想做的事</h3>
+        <p>从全网 <span class="js-tool-count">3,847</span> 款中文 AI 工具里，AI 帮你挑出最合适的几款。</p>
+        <div class="assistant-input-mock">
+          <i data-lucide="search" style="width:11px;height:11px;vertical-align:middle;margin-right:4px;"></i>想做个中文播客转写工具<span class="cur"></span>
+        </div>
+        <a href="#" class="btn-launch" onclick="event.preventDefault(); window.openMoxieChat && window.openMoxieChat();">立即试用</a>
+      </div>
+
+      <div class="side-block">
+        <div class="sec-label">
+          <span>本周编辑推荐</span>
+        </div>
+        <div class="pick-list" id="pickList">
+          <div class="pick-mini">
+            <div class="ptitle">
+              <span class="name">Cherry Studio</span>
+              <span class="verified-tag">子墨测过</span>
+            </div>
+            <div class="quote">开源 AI 桌面客户端，50+ 模型一键切换，原生 MCP，开发者必装。</div>
+            <div class="meta">
+              <span>测试 7 天</span>
+              <span class="upv">▲ 1,247</span>
+            </div>
+          </div>
+          <div class="pick-mini">
+            <div class="ptitle">
+              <span class="name">沉浸式翻译</span>
+              <span class="verified-tag">子墨测过</span>
+            </div>
+            <div class="quote">网页双语对照翻译扩展，看英文论文 / Hacker News 必装。</div>
+            <div class="meta">
+              <span>测试 14 天</span>
+              <span class="upv">▲ 892</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-cta-box">
+        <h4>// MAKERS</h4>
+        <p>你的中文 AI 工具，submit 给 MOXIE 收录。</p>
+        <a href="moxie-submit.html" class="btn-submit">提交我的产品</a>
+      </div>
+
+      <div class="side-block">
+        <div class="sec-label">
+          <span>每日 AI 快讯热闻 <span class="news-head-live"><span class="d"></span>实时</span></span>
+          <a href="moxie-news.html" class="all-link" style="font-size:11px">更多 →</a>
+        </div>
+        <nav class="news-list" id="newsList">
+          <a class="news-item" href="#"><span class="news-tag">大模型</span><span class="news-title">OpenAI 据传下月发布新一代推理模型,主打 Agent 长任务</span><span class="news-time">1h</span></a>
+          <a class="news-item" href="#"><span class="news-tag">编程</span><span class="news-title">Anthropic Claude 代码能力更新,SWE-bench 再创新高</span><span class="news-time">3h</span></a>
+          <a class="news-item" href="#"><span class="news-tag">视频</span><span class="news-title">快手可灵上线 2.0,运动一致性大幅提升</span><span class="news-time">5h</span></a>
+          <a class="news-item" href="#"><span class="news-tag">国产</span><span class="news-title">阿里通义千问开源新尺寸模型,中文长文更强</span><span class="news-time">7h</span></a>
+          <a class="news-item" href="#"><span class="news-tag">融资</span><span class="news-title">某国产 Agent 公司完成新一轮融资,估值翻倍</span><span class="news-time">9h</span></a>
+          <a class="news-item" href="#"><span class="news-tag">政策</span><span class="news-title">多地出台 AIGC 内容标识新规,平台需显著标注</span><span class="news-time">12h</span></a>
+        </nav>
+        <script>
+          /* 快讯接真源:DB 就绪后读 moxie_news 渲染(cron 拉 RSS 写入);失败/空则保留占位并让占位可点搜索。 */
+          (function(){
+            var box = document.getElementById('newsList');
+            function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+            function rel(s){ if(!s) return ''; var d=new Date(s); if(isNaN(d)) return ''; var m=(Date.now()-d)/6e4; if(m<60) return Math.max(1,Math.round(m))+'分钟'; var h=m/60; if(h<24) return Math.round(h)+'h'; var dd=h/24; return Math.round(dd)+'d'; }
+            function fallbackClickable(){
+              box.querySelectorAll('.news-item').forEach(function(a){
+                if(a.getAttribute('href') && a.getAttribute('href')!=='#') return;
+                var t=(a.querySelector('.news-title')||{}).textContent||'';
+                a.href='https://www.bing.com/search?q='+encodeURIComponent(t.trim()); a.target='_blank'; a.rel='noopener';
+              });
+            }
+            if (!window.moxieWhenDBReady) { fallbackClickable(); return; }
+            window.moxieWhenDBReady(async function(db){
+              try {
+                if (!db || !box || !window.MoxieDB || !window.MoxieDB.news) { fallbackClickable(); return; }
+                var res = await window.MoxieDB.news({ limit: 5 });
+                var items = res && res.data;
+                if (!items || !items.length) { fallbackClickable(); return; }
+                box.innerHTML = items.map(function(n){
+                  var time = rel(n.published_at);
+                  return '<a class="news-item" href="/news/'+n.id+'">'
+                    + '<span class="news-tag">'+esc(n.tag||n.source||'')+'</span>'
+                    + '<span class="news-title">'+esc(n.title)+'</span>'
+                    + '<span class="news-time">'+esc(time)+'</span></a>';
+                }).join('');
+              } catch(e){ fallbackClickable(); }
+            });
+          })();
+        </script>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- 近期文章 / 每日 AI 快讯热闻 已移入上方榜单两侧(左栏 / 右栏) -->
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="moxie-preview.html" class="brand-logo">
+          <img src="public/moxie-logo.png?v=20260525-01" alt="MOXIE" width="117" height="28">
+        </a>
+        <p style="margin-top: 14px;">MOXIE 是 AI 的选型决策平台，编辑团队深度测试制，独立运营。</p>
+        <div class="meta-line">
+          <span class="live-dot"></span>
+          MOXIE · BUILD 2026.05.23 · <span class="js-tool-count">3,847</span> TOOLS
+        </div>
+      </div>
+      <div class="fcol">
+        <h4>发现</h4>
+        <a href="moxie-preview.html">今日上新</a>
+        <a href="moxie-business.html">商业落地</a>
+        <div class="nav-mega" id="navMega">
+        <button class="nav-mega-trigger" type="button">
+          分类
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="mega-menu">
+          <div class="mega-grid">
+            <div class="mega-col">
+              <h4>AIGC 创作 <span class="h4-tag">184</span></h4>
+              <ul>
+                <li><a href="moxie-aigc.html"><span>AI 写作</span><span class="cnt">42</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 图像</span><span class="cnt">58</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 视频</span><span class="cnt">36</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 语音 / 配音</span><span class="cnt">24</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 音乐</span><span class="cnt">14</span></a></li>
+                <li><a href="moxie-aigc.html"><span>AI 数字人</span><span class="cnt">10</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>模型 / 平台 <span class="h4-tag">125</span></h4>
+              <ul>
+                <li><a href="moxie-preview.html"><span>大模型</span><span class="cnt">32</span></a></li>
+                <li><a href="moxie-preview.html"><span>AI 助手</span><span class="cnt">28</span></a></li>
+                <li><a href="moxie-business.html"><span>RAG 知识库</span><span class="cnt">28</span></a></li>
+                <li><a href="moxie-business.html"><span>AI Agent</span><span class="cnt">19</span></a></li>
+                <li><a href="moxie-business.html"><span>工作流 / Bot</span><span class="cnt">25</span></a></li>
+                <li><a href="moxie-business.html"><span>客服 / SDR</span><span class="cnt">14</span></a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>开发者 / 效率 <span class="h4-tag">156</span></h4>
+              <ul>
+                <li><a href="moxie-preview.html"><span>AI 编程</span><span class="cnt">41</span></a></li>
+                <li><a href="moxie-preview.html"><span>AI 搜索</span><span class="cnt">18</span></a></li>
+                <li><a href="moxie-preview.html"><span>翻译</span><span class="cnt">12</span></a></li>
+                <li><a href="moxie-preview.html"><span>Chrome 扩展</span><span class="cnt">38</span></a></li>
+                <li><a href="moxie-preview.html"><span>办公 / 协作</span><span class="cnt">22</span></a></li>
+                <li><a href="moxie-preview.html"><span>数据分析</span><span class="cnt">16</span></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="mega-foot">
+            <a href="moxie-categories.html" class="all-link">查看全部 <span class="js-cat-count">24</span> 个分类 →</a>
+            <span class="submit-hint">没找到你的分类？<a href="moxie-submit.html">提交一个</a></span>
+          </div>
+        </div>
+      </div>
+        <a href="moxie-blog.html">文章</a>
+      </div>
+      <div class="fcol">
+        <h4>产品</h4>
+        <a href="#" onclick="event.preventDefault(); window.openMoxieChat && window.openMoxieChat();">MOXIE 助手</a>
+        <span class="planned">提示词订阅 <span class="tag">规划中</span></span>
+        <span class="planned">AI 花销追踪 <span class="tag">规划中</span></span>
+      </div>
+      <div class="fcol">
+        <h4>资源</h4>
+        <a href="moxie-about.html">关于我们</a>
+        <a href="moxie-about.html#faq">FAQ</a>
+        
+      </div>
+      <div class="fcol">
+        <h4>合作</h4>
+        <a href="moxie-submit.html">提交产品</a>
+        
+        <a href="moxie-pricing.html">商务合作</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2024 — 2026 MOXIE</span>
+      <div class="right">
+        <a href="moxie-privacy.html">隐私政策</a>
+        <a href="moxie-terms.html">服务条款</a>
+        <a href="moxie-about.html">联系我们</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════ 浮动 FAB ═══════ -->
+<button class="fab" id="fab" aria-label="打开 MOXIE 助手">
+  <img src="public/moxie-mark.png?v=20260525-01" alt="MOXIE">
+</button>
+
+<!-- ═══════ MOXIE 助手 · 客服对话 widget ═══════ -->
+<div class="chat-widget" id="chatWidget" hidden data-lenis-prevent>
+  <div class="chat-header">
+    <div class="chat-agent">
+      <div class="chat-avatar"><img src="public/moxie-mark.png?v=20260525-01" alt="MOXIE"></div>
+      <div>
+        <div class="chat-name">MOXIE 助手</div>
+        <div class="chat-status">在线 · 通常 1 分钟内回复</div>
+      </div>
+    </div>
+    <button class="chat-close" id="chatClose" aria-label="关闭对话">×</button>
+  </div>
+
+  <div class="chat-body" id="chatBody" data-lenis-prevent></div>
+
+  <div class="chat-footer">
+    <input class="chat-input" id="chatInput" placeholder="输入你的问题…" autocomplete="off">
+    <button class="chat-send" id="chatSend" aria-label="发送">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  /* ──────────── 1. Lenis 平滑滚动 ──────────── */
+  const lenis = new Lenis({
+    duration: 1.1,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+  });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+
+  /* ──────────── 2. Lucide 图标渲染 ──────────── */
+  if (window.lucide) lucide.createIcons();
+
+  /* ──────────── 3. Sparkline · Stripe Dashboard 风格 ──────────── */
+  /*    渐变面积 + 上期基线虚线 + 终点光晕双圆 + 涨跌 chip       */
+  function buildSpark(svg, data, idx) {
+    const w = 100, h = 38, pad = 4;
+    if (!data || data.length < 2) return;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = (max - min) || 1;
+    const pts = data.map((v, i) => ({
+      x: (i / (data.length - 1)) * w,
+      y: h - pad - ((v - min) / range) * (h - pad * 2),
+    }));
+    let d = `M${pts[0].x.toFixed(2)},${pts[0].y.toFixed(2)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      d += ` C${cp1x.toFixed(2)},${cp1y.toFixed(2)} ${cp2x.toFixed(2)},${cp2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
+    }
+    const last = pts[pts.length - 1];
+    const first = pts[0];
+    const isAccent = svg.closest('.hero-data-cell')?.classList.contains('accent');
+    const stop = isAccent ? '#DD6E4C' : '#86909C';
+    const gradId = `sg${idx}`;
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${stop}" stop-opacity="${isAccent ? 0.22 : 0.14}" />
+          <stop offset="100%" stop-color="${stop}" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path class="area" d="${d} L${w},${h} L0,${h} Z" fill="url(#${gradId})" />
+      <line class="baseline" x1="0" y1="${first.y.toFixed(2)}" x2="${w}" y2="${first.y.toFixed(2)}" />
+      <path class="line" d="${d}" />
+      <circle class="dot-halo" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="4.2" />
+      <circle class="dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.2" />
+    `;
+  }
+  const sparkData = {
+    '0': [3651, 3702, 3718, 3743, 3760, 3782, 3801, 3820, 3847],   // 已收录
+    '1': [6120, 6168, 6205, 6238, 6270, 6310, 6355, 6390, 6412],   // 订阅
+    '2': [82, 89, 86, 93, 99, 96, 102, 105, 109],                  // 本月新增
+    '3': [4.88, 4.90, 4.89, 4.91, 4.92, 4.92, 4.93, 4.94, 4.94],   // 满意度
+  };
+  document.querySelectorAll('.spark[data-spark]').forEach(svg => {
+    buildSpark(svg, sparkData[svg.dataset.spark], svg.dataset.spark);
+  });
+  /* 涨跌 chip：从 series[0] → series[last] 计算 */
+  document.querySelectorAll('.chip[data-chip]').forEach(chip => {
+    const series = sparkData[chip.dataset.chip];
+    if (!series || series.length < 2) return;
+    const first = series[0], last = series[series.length - 1];
+    const pct = ((last - first) / first) * 100;
+    const up = pct >= 0;
+    const arrow = up
+      ? '<svg viewBox="0 0 8 8" width="8" height="8" fill="currentColor"><path d="M4 1 L7 6 L1 6 Z"/></svg>'
+      : '<svg viewBox="0 0 8 8" width="8" height="8" fill="currentColor"><path d="M4 7 L1 2 L7 2 Z"/></svg>';
+    chip.innerHTML = `${arrow}<span>${up ? '+' : ''}${pct.toFixed(1)}%</span>`;
+  });
+
+  /* ──────────── 4. 数字滚动 NumberTicker ──────────── */
+  function animateNum(el) {
+    const target = parseFloat(el.dataset.target);
+    const isFloat = el.dataset.float === '1';
+    const dur = 1400 + Math.random() * 300;
+    const start = performance.now();
+    function frame(now) {
+      const p = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = target * eased;
+      el.textContent = isFloat ? val.toFixed(2) : Math.round(val).toLocaleString();
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  document.querySelectorAll('[data-target]').forEach(el => {
+    setTimeout(() => animateNum(el), 200);
+  });
+
+  /* ──────────── 5. GSAP ScrollTrigger 进场 + SplitText 拆字 ──────────── */
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    if (window.SplitText) gsap.registerPlugin(SplitText);
+
+    // 5.1 hero h1 按词进场（SplitText）
+    const h1 = document.querySelector('.hero h1');
+    if (h1 && window.SplitText) {
+      h1.classList.add('split-ready');
+      const split = new SplitText(h1, { type: 'words', wordsClass: 'word' });
+      gsap.set(split.words, { yPercent: 60, opacity: 0, filter: 'blur(6px)' });
+      h1.classList.remove('split-ready');
+      gsap.to(split.words, {
+        yPercent: 0,
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 0.8,
+        stagger: 0.04,
+        ease: 'power3.out',
+        delay: 0.15,
+      });
+    }
+
+    // 5.2 通用滚动揭示（替代旧 IntersectionObserver）
+    const reveals = gsap.utils.toArray('.prow, .blog-card, .pick-mini, .post-item');
+    reveals.forEach((el) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 14, filter: 'blur(2px)' },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.55,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    });
+
+    // 5.3 hero 数据栏 sparkline 进入视口时 draw
+    gsap.utils.toArray('.hero-data-cell').forEach((cell, i) => {
+      gsap.from(cell, {
+        opacity: 0,
+        y: 10,
+        duration: 0.5,
+        delay: 0.3 + i * 0.06,
+        ease: 'power2.out',
+      });
+    });
+  } else {
+    // GSAP 加载失败时的 fallback —— 走原 IntersectionObserver
+    const fadeTargets = document.querySelectorAll('.prow, .blog-card, .pick-mini, .post-item');
+    fadeTargets.forEach((el) => el.classList.add('fade-in'));
+    const io = new IntersectionObserver((entries) => {
+      let delay = 0;
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('shown'), delay);
+          delay += 40;
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+    fadeTargets.forEach((el) => io.observe(el));
+  }
+
+  /* ──────────── 5.5 卡片 cursor 跟随聚光灯（Aceternity 风） ──────────── */
+  document.querySelectorAll('.prow, .blog-card').forEach((card) => {
+    card.addEventListener('mouseenter', () => card.style.setProperty('--spot-opacity', '1'));
+    card.addEventListener('mouseleave', () => card.style.setProperty('--spot-opacity', '0'));
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--spot-x', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--spot-y', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  /* ──────────── 6. 倒计时到明天 09:00 · 相对时间表达 ──────────── */
+  function tick() {
+    const now = new Date();
+    const target = new Date();
+    target.setHours(9, 0, 0, 0);
+    if (now >= target) target.setDate(target.getDate() + 1);
+    const diff = Math.max(0, target - now);
+    const totalMin = Math.floor(diff / 60000);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    let label;
+    if (h >= 1) label = `${h} 小时 ${m} 分后`;
+    else if (totalMin >= 1) label = `${totalMin} 分钟后`;
+    else label = '即将上新';
+    const rel = document.getElementById('cd-rel');
+    if (rel) rel.textContent = label;
+  }
+  tick(); setInterval(tick, 30000); /* 30s 一次足够，无秒级显示 */
+
+  /* ──────────── Install Tabs + 复制 ──────────── */
+  const installVariants = {
+    'chat-0': {
+      hint: '这段提示词发给 Claude / Cursor / Trae，它选 AI 工具时会从 MOXIE 精选库里挑。',
+      cmd:  '参考 https://latemai.com/install/agent.md 接入 MOXIE 精选库'
+    },
+    'chat-1': {
+      hint: '直接调 MOXIE REST API 拿原始数据，自己定推荐策略。',
+      cmd:  'curl "https://sqvohgcwzhhsvkmyesvs.supabase.co/rest/v1/moxie_products?status=eq.published&order=vote_count.desc" -H "apikey: <见 agent.md>"'
+    },
+    'cli-0': {
+      hint: '一行 curl 装好，无 npm 环境也能跑，macOS / Linux 通用。',
+      cmd:  'curl -fsSL https://latemai.com/install.sh | sh'
+    },
+    'cli-1': {
+      hint: '装好后 moxie list / search / get / init 任你查。',
+      cmd:  'moxie list  # 本周精选 12 个，加 --json 给 AI 用'
+    }
+  };
+  let currentMode = 'chat';
+  let currentSub = 0;
+  function renderInstall() {
+    const key = currentMode + '-' + currentSub;
+    const v = installVariants[key] || installVariants['chat-0'];
+    document.querySelector('#installPanel .install-hint').innerHTML = v.hint;
+    document.getElementById('installCmd').textContent = v.cmd;
+  }
+  document.querySelectorAll('.install-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.install-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.install;
+      renderInstall();
+    });
+  });
+  document.querySelectorAll('.install-subtab').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.install-subtab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSub = i;
+      renderInstall();
+    });
+  });
+  // 复制按钮 · 浮窗提示，按钮本身不变色
+  const copyBtn = document.getElementById('copyBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const text = document.getElementById('installCmd').textContent;
+      navigator.clipboard?.writeText(text).then(() => {
+        let toast = copyBtn.querySelector('.copy-toast');
+        if (!toast) {
+          toast = document.createElement('span');
+          toast.className = 'copy-toast';
+          toast.textContent = '已复制';
+          copyBtn.appendChild(toast);
+        }
+        requestAnimationFrame(() => toast.classList.add('visible'));
+        clearTimeout(copyBtn._toastTimer);
+        copyBtn._toastTimer = setTimeout(() => {
+          toast.classList.remove('visible');
+        }, 1400);
+      });
+    });
+  }
+
+  /* ──────────── 7. 分类 chip filter ──────────── */
+  const chips = document.querySelectorAll('.cat-chip');
+  const rows = document.querySelectorAll('.prod-list .prow');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const cat = chip.dataset.cat;
+      rows.forEach(row => {
+        if (row.classList.contains('featured-empty')) return;
+        if (cat === 'all') {
+          row.style.display = '';
+        } else {
+          const tags = [...row.querySelectorAll('.ptag')].map(t => t.textContent.trim()).join(',');
+          row.style.display = tags.includes(cat) ? '' : 'none';
+        }
+      });
+    });
+  });
+
+  /* ──────────── 8. FAB + 客服对话 widget (MOXIE 助手) ──────────── */
+  const fab = document.getElementById('fab');
+  const chatWidget = document.getElementById('chatWidget');
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+  const chatClose = document.getElementById('chatClose');
+  let chatInitialized = false;
+
+  /* 全程跟随：进入页面后立即显示，不再绑定滚动 */
+  requestAnimationFrame(() => fab.classList.add('visible'));
+
+  function openChat() {
+    chatWidget.hidden = false;
+    if (!chatInitialized) { initChat(); chatInitialized = true; }
+    setTimeout(() => chatInput.focus(), 200);
+  }
+  function closeChat() { chatWidget.hidden = true; }
+  function toggleChat() { chatWidget.hidden ? openChat() : closeChat(); }
+  /* 对外暴露给 hero CTA 调用 */
+  window.openMoxieChat = openChat;
+
+  /* 从其他页 footer 跳过来 ?chat=open 时自动开 */
+  if (new URLSearchParams(location.search).get('chat') === 'open') {
+    setTimeout(openChat, 400);
+  }
+
+  fab.addEventListener('click', toggleChat);
+  chatClose.addEventListener('click', closeChat);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !chatWidget.hidden) closeChat();
+  });
+  window.lenis = lenis;
+
+  /* Topbar 登录态 + welcome：统一在 moxie-shared 的 wireUserMenu() 处理 */
+
+  /* ──────────── 从 Supabase 拉今日产品列表 ──────────── */
+  window.moxieWhenDBReady(async (db) => {
+    const box = document.getElementById('prodList');
+    if (!box) return;
+    if (!db) {
+      box.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">
+        Supabase 还没配置 — 打开 moxie-supabase.js?v=20260611-01 填 URL 和 anon key
+      </div>`;
+      return;
+    }
+    const { data, error } = await window.MoxieDB.products({ limit: 12, orderBy: 'weight_score' });
+    if (error || !data?.length) {
+      box.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">
+        ${error ? '加载失败：' + (error.message || error) : '暂无数据 — 跑 migration_001_init.sql 灌种子'}
+      </div>`;
+      return;
+    }
+    box.innerHTML = data.map((p, i) => `
+      <a class="prow" href="/tools/${encodeURIComponent(p.slug)}">
+        <span class="prank-cell"><span class="hash">#</span>${String(i+1).padStart(2,'0')}</span>
+        <div class="plogo has-img"><img src="/public/logos/${p.domain}.png" data-domain="${p.domain}" alt="${escAttr(p.name)}" onerror="moxieLogoFallback(this)" /></div>
+        <div class="pmain">
+          <div class="ptop">
+            <span class="pname">${escHtml(p.name)}</span>
+            ${p.verified ? '<span class="verified-tag">子墨测过</span>' : ''}${domBadge(p)}
+          </div>
+          <div class="pdesc">${escHtml(p.tagline)}</div>
+        </div>
+        <div class="ptags">${(p.tags||[]).slice(0,2).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
+        <span class="pprice">${escHtml(p.price_label || '免费')}</span>
+        <div class="pvote" data-product-id="${p.id}"><span class="tri">▲</span><span class="num">${p.vote_count}</span></div>
+      </a>
+    `).join('');
+    // 重新触发 visit-link 注入 + vote wiring
+    document.querySelectorAll('.prow').forEach(r => {
+      if (window.lucide) lucide.createIcons();
+    });
+    // 让 shared.js 的 wireVotes 再跑一次（覆盖新 DOM）
+    if (window.MoxieRewire) window.MoxieRewire();
+  });
+
+  function escHtml(s) { return String(s ?? '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escAttr(s) { return escHtml(s); }
+  // 国内可用小标(列表用):是→直连 / 需代理 / 否→不可用;不详不显示
+  function domBadge(p) {
+    var d = p && p.domestic_available;
+    if (d === '是') return '<span class="pdom pdom-yes">直连</span>';
+    if (d === '需代理') return '<span class="pdom pdom-proxy">需代理</span>';
+    if (d === '否') return '<span class="pdom pdom-no">不可用</span>';
+    return '';
+  }
+
+  /* ──────────── 探索区搜索 · 真接 Supabase ──────────── */
+  (function wireExploreSearch() {
+    const input = document.querySelector('.explore-search input');
+    const box   = document.getElementById('prodList');
+    const showAll = document.getElementById('showAllRow');
+    if (!input || !box) return;
+
+    let lastTodayHTML = null;        // 缓存"今日精选"渲染结果，清空时还原
+    let searchToken   = 0;           // 防止旧请求覆盖新请求
+    let debounceTimer = null;
+
+    function renderRows(data) {
+      box.innerHTML = data.map((p, i) => `
+        <a class="prow" href="/tools/${encodeURIComponent(p.slug)}">
+          <span class="prank-cell"><span class="hash">#</span>${String(i+1).padStart(2,'0')}</span>
+          <div class="plogo has-img"><img src="/public/logos/${p.domain}.png" data-domain="${p.domain}" alt="${escAttr(p.name)}" onerror="moxieLogoFallback(this)" /></div>
+          <div class="pmain">
+            <div class="ptop">
+              <span class="pname">${escHtml(p.name)}</span>
+              ${p.verified ? '<span class="verified-tag">子墨测过</span>' : ''}${domBadge(p)}
+            </div>
+            <div class="pdesc">${escHtml(p.tagline)}</div>
+          </div>
+          <div class="ptags">${(p.tags||[]).slice(0,2).map(t => `<span class="ptag">${escHtml(t)}</span>`).join('')}</div>
+          <span class="pprice">${escHtml(p.price_label || '免费')}</span>
+          <div class="pvote" data-product-id="${p.id}"><span class="tri">▲</span><span class="num">${p.vote_count}</span></div>
+        </a>
+      `).join('');
+      if (window.lucide) lucide.createIcons();
+      if (window.MoxieRewire) window.MoxieRewire();
+    }
+
+    function showEmpty(q) {
+      box.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">
+        没有匹配 "${escHtml(q)}" 的工具 — 试试更短的关键词，或<a href="moxie-submit.html" style="color:var(--accent);text-decoration:underline;">提交一款</a>
+      </div>`;
+      if (showAll) showAll.style.display = 'none';
+    }
+
+    function showError(msg) {
+      box.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">搜索失败：${escHtml(msg)}</div>`;
+      if (showAll) showAll.style.display = 'none';
+    }
+
+    function restoreToday() {
+      if (lastTodayHTML !== null) {
+        box.innerHTML = lastTodayHTML;
+        if (window.lucide) lucide.createIcons();
+        if (window.MoxieRewire) window.MoxieRewire();
+      }
+      if (showAll) showAll.style.display = '';
+    }
+
+    async function runSearch(q) {
+      if (lastTodayHTML === null) lastTodayHTML = box.innerHTML;
+      const myToken = ++searchToken;
+      box.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:13px;">搜索中…</div>`;
+      if (showAll) showAll.style.display = 'none';
+
+      if (!window.moxieDB || !window.MoxieDB?.searchProducts) {
+        showError('数据库未就绪');
+        return;
+      }
+      const { data, error } = await window.MoxieDB.searchProducts(q, { limit: 24 });
+      if (myToken !== searchToken) return;       // 已被更新的请求覆盖
+      if (error) { showError(error.message || error); return; }
+      if (!data || !data.length) { showEmpty(q); return; }
+      renderRows(data);
+    }
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      clearTimeout(debounceTimer);
+      if (!q) { searchToken++; restoreToday(); return; }
+      debounceTimer = setTimeout(() => runSearch(q), 280);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        clearTimeout(debounceTimer);
+        const q = input.value.trim();
+        if (q) runSearch(q); else restoreToday();
+      } else if (e.key === 'Escape') {
+        input.value = '';
+        searchToken++;
+        restoreToday();
+      }
+    });
+
+    /* 顶栏放大镜点击 → 滚到探索区 + 聚焦输入 */
+    window.moxieFocusSearch = function () {
+      const target = document.querySelector('.explore-block');
+      if (!target) { input.focus(); return; }
+      const top = target.getBoundingClientRect().top + window.pageYOffset - 80;
+      if (window.lenis?.scrollTo) window.lenis.scrollTo(top); else window.scrollTo({ top, behavior: 'smooth' });
+      setTimeout(() => input.focus(), 320);
+    };
+    if (location.hash === '#search') {
+      setTimeout(() => window.moxieFocusSearch(), 200);
+      history.replaceState({}, '', location.pathname);
+    }
+  })();
+
+  /* ── 对话渲染 helpers ── */
+  function escapeHtml(s) {
+    return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  }
+  function scrollChat() {
+    setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 30);
+  }
+  function botBubble(html, quickReplies = []) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = `
+      <div class="av"><img src="public/moxie-mark.png?v=20260525-01" alt="MOXIE"></div>
+      <div>
+        <div class="bubble">${html}</div>
+        ${quickReplies.length ? `<div class="quick-replies">${quickReplies.map(r => `<span class="quick-reply">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
+      </div>
+    `;
+    chatBody.appendChild(wrap);
+    wrap.querySelectorAll('.quick-reply').forEach(qr => {
+      qr.addEventListener('click', () => handleUserInput(qr.textContent));
+    });
+    scrollChat();
+    return wrap;
+  }
+  function userBubble(text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg user';
+    wrap.innerHTML = `<div class="av">你</div><div class="bubble">${escapeHtml(text)}</div>`;
+    chatBody.appendChild(wrap);
+    scrollChat();
+  }
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = `
+      <div class="av"><img src="public/moxie-mark.png?v=20260525-01" alt="MOXIE"></div>
+      <div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>
+    `;
+    chatBody.appendChild(wrap);
+    scrollChat();
+    return wrap;
+  }
+
+  /* 初始欢迎 + 预设主题 chips */
+  function initChat() {
+    botBubble(
+      `👋 Hi！我是 <strong>MOXIE 助手</strong>，可以帮你找工具、解答 MOXIE 相关问题。<br>选一个主题，或直接打字告诉我：`,
+      [
+        '🔧 找 AI 编程工具',
+        '🎬 找视频生成模型',
+        '📚 RAG 知识库',
+        '📩 怎么提交我的产品',
+        '💰 PREMIUM 怎么收费',
+        '👤 联系真人',
+      ]
+    );
+  }
+
+  function handleUserInput(raw) {
+    const text = (raw || '').trim();
+    if (!text) return;
+    userBubble(text);
+    chatInput.value = '';
+    const typing = showTyping();
+    setTimeout(() => {
+      typing.remove();
+      respond(text);
+    }, 600 + Math.random() * 400);
+  }
+
+  function respond(query) {
+    const q = query.toLowerCase();
+    /* 跳转类 quick reply */
+    if (q === '前往提交页') { window.location.href = 'moxie-submit.html'; return; }
+    if (q === '看完整价格' || q === '商务合作') { window.location.href = 'moxie-pricing.html'; return; }
+    if (q === '看 faq') { window.location.href = 'moxie-about.html#faq'; return; }
+    if (q === '看完整榜单') { window.location.href = 'moxie-preview.html#today-list'; return; }
+    if (q === '再问一个') { chatInput.focus(); botBubble('你想找哪类工具？随便说，比如「想做中文播客转写」、「找 RAG 知识库」'); return; }
+
+    /* 服务类（关键词匹配） */
+    if (q.includes('提交') || q.includes('上榜') || q.includes('submit')) {
+      botBubble('提交产品需要 2 分钟：访问 <a href="moxie-submit.html">提交页面</a>，填表后编辑团队 48 小时内审核。常见拒稿原因：纯套壳、停更超 90 天、明显软文页面。', ['前往提交页', '看 FAQ']);
+      return;
+    }
+    if (q.includes('premium') || q.includes('收费') || q.includes('价格') || q.includes('多少钱') || q.includes('订阅')) {
+      botBubble('我们有三档方案：<br>① <strong>PRO 个人</strong> ¥29/月<br>② <strong>TEAM 团队</strong> ¥99/月<br>③ <strong>PREMIUM 上榜</strong> ¥1,200 起/条<br>详情看 <a href="moxie-pricing.html">完整价格 →</a>', ['看完整价格', '商务合作']);
+      return;
+    }
+    if (q.includes('真人') || q.includes('客服') || q.includes('联系')) {
+      botBubble('需要真人帮忙的话：<br>· 商务合作 <strong>hello@moxie.com</strong><br>· 反馈 / Bug <strong>feedback@moxie.com</strong><br>· 媒体咨询 <strong>press@moxie.com</strong><br>工作日内 24 小时回复。');
+      return;
+    }
+    if (q.includes('退款') || q.includes('注销')) {
+      botBubble('退款 / 注销请发邮件到 <strong>hello@moxie.com</strong>，注明订单号，我们会在 1 个工作日内处理。');
+      return;
+    }
+
+    /* 工具推荐 */
+    const results = matchProducts(query);
+    if (!results.length) {
+      botBubble('工具库还在加载，稍等 1 秒再试一下。');
+      return;
+    }
+    const matchPcts = [97, 89, 82];
+    const cardsHtml = results.map((r, i) => `
+      <div class="product-card" data-href="moxie-product.html">
+        <img src="/public/logos/${r.domain}.png" data-domain="${r.domain}" alt="${r.name}" onerror="moxieLogoFallback(this)">
+        <div class="pc-info">
+          <div class="pc-name">${escapeHtml(r.name)}</div>
+          <div class="pc-desc">${escapeHtml(r.desc)}</div>
+        </div>
+        <div class="pc-match">${matchPcts[i]}%</div>
+      </div>
+    `).join('');
+    const reply = botBubble(`基于「<strong>${escapeHtml(query)}</strong>」推荐这 3 款：<div class="product-cards">${cardsHtml}</div>`, ['再问一个', '看完整榜单']);
+    reply.querySelectorAll('.product-card').forEach(pc => {
+      pc.addEventListener('click', () => window.location.href = pc.dataset.href);
+    });
+  }
+
+  chatSend.addEventListener('click', () => handleUserInput(chatInput.value));
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleUserInput(chatInput.value);
+  });
+
+  /* ──────────── 9. 投票 (localStorage 持久化) ──────────── */
+  const voted = new Set(JSON.parse(localStorage.getItem('moxie-votes') || '[]'));
+  function persistVotes() {
+    localStorage.setItem('moxie-votes', JSON.stringify([...voted]));
+  }
+  function bindVote(el, key, numEl) {
+    if (voted.has(key)) el.classList.add('voted');
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      let n = parseInt(numEl.textContent.replace(/,/g, ''));
+      if (voted.has(key)) {
+        n -= 1;
+        voted.delete(key);
+        el.classList.remove('voted');
+      } else {
+        n += 1;
+        voted.add(key);
+        el.classList.add('voted');
+        el.classList.remove('pulse');
+        void el.offsetWidth;
+        el.classList.add('pulse');
+        setTimeout(() => el.classList.remove('pulse'), 460);
+      }
+      numEl.textContent = n.toLocaleString();
+      persistVotes();
+    });
+  }
+  document.querySelectorAll('.prow .pvote').forEach((v, i) => {
+    const numEl = v.querySelector('.num');
+    if (numEl) bindVote(v, 'p' + i, numEl);
+  });
+  // Top1 vote 数字也可点
+  const top1Num = document.querySelector('.top1-vote .num');
+  if (top1Num) bindVote(top1Num, 'top1', top1Num);
+
+  /* ──────────── 10. 工具推荐数据 + 匹配 (chat widget 使用) ──────────── */
+  /* 改自 Supabase 实拉 — 启动时从 moxie_products 拉一次，分类 + tags + name 当关键字 */
+  let productDB = [];
+  window.moxieWhenDBReady(async function (db) {
+    if (!db || !window.MoxieDB) return;
+    try {
+      var res = await window.MoxieDB.products({ limit: 50, orderBy: 'vote_count' });
+      var rows = res && res.data ? res.data : [];
+      productDB = rows.map(function (p) {
+        var catName = (p.moxie_categories && p.moxie_categories.name) ? String(p.moxie_categories.name) : '';
+        var kw = [].concat(p.tags || [], [catName, p.name]).filter(Boolean).map(function (s) { return String(s).toLowerCase(); });
+        return {
+          name: p.name,
+          domain: p.domain || '',
+          desc: p.tagline || '',
+          slug: p.slug,
+          kw: kw,
+        };
+      });
+    } catch (e) { console.warn('[chat] failed to load productDB', e); }
+  });
+  function matchProducts(query) {
+    if (!productDB.length) return [];
+    const q = query.toLowerCase();
+    return productDB.map(p => {
+      let score = 0;
+      p.kw.forEach(k => { if (q.includes(k)) score += 30; });
+      if (q.includes(p.name.toLowerCase())) score += 40;
+      score += Math.random() * 6;
+      return { ...p, score };
+    }).sort((a, b) => b.score - a.score).slice(0, 3);
+  }
+
+  /* ──────────── 11. 卡片点击跳产品页 ──────────── */
+  // 产品行（避开投票按钮）
+  document.querySelectorAll('.prow:not(.featured-empty)').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.pvote')) return;
+      window.location.href = 'moxie-product.html';
+    });
+  });
+  // Top 1 卡片
+  document.querySelector('.top1-card')?.addEventListener('click', (e) => {
+    if (e.target.closest('.btn-accent') || e.target.closest('.top1-vote')) return;
+    window.location.href = 'moxie-product.html';
+  });
+  if (document.querySelector('.top1-card')) {
+    document.querySelector('.top1-card').style.cursor = 'pointer';
+  }
+  // 右侧编辑推荐
+  document.querySelectorAll('.pick-mini').forEach(p => {
+    p.addEventListener('click', () => window.location.href = 'moxie-product.html');
+  });
+
+  /* ──────────── Mega Menu (分类 ▾) ──────────── */
+  (function(){
+    var nav = document.getElementById('navMega');
+    if (!nav) return;
+    var trigger = nav.querySelector('.nav-mega-trigger');
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      nav.classList.toggle('open');
+    });
+    document.addEventListener('click', function(e){
+      if (!nav.contains(e.target)) nav.classList.remove('open');
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') nav.classList.remove('open');
+    });
+  })();
+
+</script>
+<!-- 分类筛选:融进中间排行榜列表(点分类→该类工具;全部→top 12) -->
+<script>
+(function () {
+  var ALL = [];
+  function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function rowHTML(p, i){
+    return '<a class="prow" href="/tools/' + encodeURIComponent(p.slug) + '">'
+      + '<span class="prank-cell"><span class="hash">#</span>' + String(i+1).padStart(2,'0') + '</span>'
+      + '<div class="plogo has-img"><img src="/public/logos/' + p.domain + '.png" data-domain="' + p.domain + '" alt="' + esc(p.name) + '" onerror="moxieLogoFallback(this)"/></div>'
+      + '<div class="pmain"><div class="ptop"><span class="pname">' + esc(p.name) + '</span>'
+      + (p.verified ? '<span class="verified-tag">子墨测过</span>' : '') + domBadge(p) + '</div>'
+      + '<div class="pdesc">' + esc(p.tagline) + '</div></div>'
+      + '<div class="ptags">' + (p.tags||[]).slice(0,2).map(function(t){ return '<span class="ptag">' + esc(t) + '</span>'; }).join('') + '</div>'
+      + '<span class="pprice">' + esc(p.price_label || '免费') + '</span>'
+      + '<div class="pvote" data-product-id="' + p.id + '"><span class="tri">▲</span><span class="num">' + p.vote_count + '</span></div>'
+      + '</a>';
+  }
+  function show(catId){
+    var box = document.getElementById('prodList'); if (!box) return;
+    var list = catId === 'all'
+      ? ALL.slice(0, 12)
+      : ALL.filter(function(p){ return p.category_id === catId; }).sort(function(a, b){ return (b.vote_count||0) - (a.vote_count||0); });
+    box.innerHTML = list.length ? list.map(rowHTML).join('')
+      : '<div style="padding:40px 0;text-align:center;color:var(--ink-3);font-size:13px;">该分类暂无工具</div>';
+    if (window.MoxieRewire) window.MoxieRewire();
+  }
+  if (!window.moxieWhenDBReady) return;
+  window.moxieWhenDBReady(function(db){
+    if (!db) return;
+    var bar = document.getElementById('catBar'); if (!bar) return;
+    Promise.all([window.MoxieDB.categories(), window.MoxieDB.products({ limit: 500, orderBy: 'weight_score' })]).then(function(r){
+      var cats = r[0].data || [], prods = r[1].data || [];
+      ALL = prods;
+      // 真实计数填进写死的数字位
+      document.querySelectorAll('.js-tool-count').forEach(function(e){ e.textContent = prods.length; });
+      document.querySelectorAll('.js-cat-count').forEach(function(e){ e.textContent = cats.length; });
+      var cnt = {}; prods.forEach(function(p){ cnt[p.category_id] = (cnt[p.category_id]||0) + 1; });
+
+      /* ── 装饰块接真数据:热门分类 ticker / 本月趋势 / 编辑推荐 / 最新讨论 ── */
+      var catRank = cats.map(function(c){ return { name:c.name, n: cnt[c.id]||0 }; }).filter(function(x){ return x.n>0; }).sort(function(a,b){ return b.n-a.n; });
+      var tick = document.getElementById('liveTicker');
+      if(tick){ var one = catRank.map(function(c){ return '<span class="ticker-item"><span class="dot"></span>'+esc(c.name)+' <span class="time">· '+c.n+' 款</span></span>'; }).join(''); tick.innerHTML = one+one; }
+      var tl = document.getElementById('trendList');
+      if(tl){ tl.innerHTML = catRank.slice(0,5).map(function(c,i){ return '<div class="trend-item"><span class="t-rank">'+String(i+1).padStart(2,'0')+'</span><span class="t-name">'+esc(c.name)+'</span><span class="t-delta">'+c.n+' 款</span></div>'; }).join(''); }
+      db.from('moxie_products').select('name,slug,domain,tagline,vote_count,verified').eq('status','published').eq('featured',true).order('weight_score',{ascending:false}).limit(3).then(function(fr){
+        var pl=document.getElementById('pickList'), fp=(fr&&fr.data)||[];
+        if(pl&&fp.length){ pl.innerHTML = fp.map(function(p){ return '<a class="pick-mini" href="/tools/'+esc(p.slug)+'" style="text-decoration:none;color:inherit;"><div class="ptitle"><span class="name">'+esc(p.name)+'</span>'+(p.verified?'<span class="verified-tag">子墨测过</span>':'')+'</div><div class="quote">'+esc(p.tagline||'')+'</div><div class="meta"><span>'+esc(p.domain)+'</span><span class="upv">▲ '+(p.vote_count||0)+'</span></div></a>'; }).join(''); }
+      });
+      // AI 业界热议 = moxie_voices(名人观点:evergreen 种子 + 每日从快讯抽取,按重要度+日期排序);兜底静态池
+      db.from('moxie_voices').select('person,role,take,news_id').order('importance',{ascending:false}).order('published_at',{ascending:false,nullsFirst:false}).limit(5).then(function(vr){
+        var pl2=document.getElementById('postList'); if(!pl2) return;
+        var vs=(vr&&vr.data)||[];
+        if(!vs.length){
+          var POOL=[
+            {person:'黄仁勋',role:'英伟达 CEO',take:'AI 是新的工业革命,自然语言正成为新的编程语言。'},
+            {person:'Sam Altman',role:'OpenAI CEO',take:'AGI 可能比多数人预期来得更快,治理要趁早。'},
+            {person:'Geoffrey Hinton',role:'深度学习之父',take:'我们真能控制比自己更聪明的 AI 吗?'},
+            {person:'Yann LeCun',role:'Meta 首席 AI 科学家',take:'只靠大语言模型到不了 AGI——它们没有世界模型。'},
+            {person:'李开复',role:'零一万物 创始人',take:'大模型是 AI 2.0,是平台级、移动互联网级的机会。'}
+          ];
+          var s=Math.floor(Date.now()/864e5)%POOL.length; vs=[]; for(var k=0;k<5;k++) vs.push(POOL[(s+k)%POOL.length]);
+        }
+        pl2.innerHTML = vs.map(function(v){
+          var href = v.news_id ? ('/news/'+v.news_id) : ('https://www.bing.com/search?q='+encodeURIComponent((v.person||'')+' '+v.take));
+          var ext = v.news_id ? '' : ' target="_blank" rel="noopener"';
+          return '<a class="post-item" href="'+href+'"'+ext+' style="text-decoration:none;color:inherit;display:block;">'
+            + '<div class="post-head"><div class="post-av">'+esc((v.person||' ')[0])+'</div><div><div class="post-name">'+esc(v.person)+'</div></div><span class="post-time">· '+esc(v.role||'')+'</span></div>'
+            + '<div class="post-title">'+esc(v.take)+'</div></a>';
+        }).join('');
+      });
+
+      var chips = [{ id: 'all', name: '全部' }].concat(cats.filter(function(c){ return cnt[c.id]; }).map(function(c){ return { id: c.id, name: c.name, n: cnt[c.id] }; }));
+      bar.innerHTML = chips.map(function(c, i){
+        return '<button class="cat-chip' + (i===0?' active':'') + '" data-cat="' + c.id + '">' + esc(c.name) + (c.n?(' <span style="opacity:.6">'+c.n+'</span>'):'') + '</button>';
+      }).join('');
+      bar.querySelectorAll('.cat-chip').forEach(function(b){
+        b.addEventListener('click', function(){
+          bar.querySelectorAll('.cat-chip').forEach(function(x){ x.classList.toggle('active', x===b); });
+          var v = b.dataset.cat;
+          show(v === 'all' ? 'all' : Number(v));
+        });
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
